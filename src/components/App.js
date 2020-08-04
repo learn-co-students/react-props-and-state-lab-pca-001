@@ -2,6 +2,7 @@ import React from 'react'
 
 import Filters from './Filters'
 import PetBrowser from './PetBrowser'
+import { PrefetchPlugin } from 'webpack'
 
 class App extends React.Component {
   constructor() {
@@ -14,6 +15,31 @@ class App extends React.Component {
       }
     }
   }
+  onChangeType = event => {
+    event.persist()
+    this.setState(previousState => {
+      return {
+        filters: {
+          ...previousState.filters,
+          type: event.target.value
+        }
+      }
+    })
+  }
+
+  onFindPetsClick = () => {
+    let type = this.state.filters.type
+
+    fetch("/api/pets" + (type && type !== "all" ? `?type=${type}` : ""))
+    .then(resp => resp.json())
+    .then(pets => this.setState({pets}))
+  }
+
+  onAdoptPet = id => {
+    let newPet = this.state.pets.find(pet => pet.id === id)
+
+    newPet.isAdopted = true
+  }
 
   render() {
     return (
@@ -24,10 +50,13 @@ class App extends React.Component {
         <div className="ui container">
           <div className="ui grid">
             <div className="four wide column">
-              <Filters />
+              <Filters
+                onChangeType={this.onChangeType}
+                onFindPetsClick={this.onFindPetsClick}/>
             </div>
             <div className="twelve wide column">
-              <PetBrowser />
+              <PetBrowser
+                onAdoptPet={this.onAdoptPet}/>
             </div>
           </div>
         </div>
