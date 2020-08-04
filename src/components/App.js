@@ -16,7 +16,7 @@ class App extends React.Component {
   }
 
   onChangeType = (event) => {
-    event.preventDefault()
+    event.persist()
     this.setState(prevState => {
       return {
         filters: {
